@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="pt">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Dados do Renavam</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa; /* Cor de fundo suave */
+            color: #343a40; /* Texto escuro para contraste */
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff; /* Fundo branco para o container */
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+        }
+        .header {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .error {
+            color: #dc3545; /* Vermelho suave para erros */
+        }
+        h5 {
+            color: #007bff; /* Azul suave para títulos */
+        }
+        .list-group-item {
+            background-color: #e9ecef; /* Fundo suave para itens da lista */
+        }
+        .list-group-item:hover {
+            background-color: #d3d3d3; /* Efeito hover suave */
+        }
+        table {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        th {
+            background-color: #f1f1f1; /* Cabeçalho da tabela com cor suave */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center my-4">Dados do Renavam</h1>
+        
+        {% if dados.error %}
+            <div class="alert alert-danger">{{ dados.error }}</div>
+        {% else %}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Renavam Nº {{ dados.renavam }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Horário da pesquisa: {{ dados.dataHoraConsulta }}</h6>
+                </div>
+            </div>
+
+            <h5>Dados do Proprietário</h5>
+            <table class="table table-bordered mb-4">
+                <tbody>
+                    <tr>
+                        <th>Nome</th>
+                        <td>{{ dados.proprietario.nome }}</td>
+                    </tr>
+                    <tr>
+                        <th>CPF/CNPJ</th>
+                        <td>{{ dados.proprietario.cpfCnpj }}</td>
+                    </tr>
+                    <tr>
+                        <th>Município</th>
+                        <td>{{ dados.proprietario.idMunicipio }} - {{ dados.proprietario.municipio }} - {{ dados.proprietario.uf }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h5>Dados do Veículo</h5>
+            <table class="table table-bordered mb-4">
+                <tbody>
+                    <tr>
+                        <th>Modelo</th>
+                        <td>{{ dados.veiculo.marcaModelo }}</td>
+                    </tr>
+                    <tr>
+                        <th>Cor</th>
+                        <td>{{ dados.veiculo.cor }}</td>
+                    </tr>
+                    <tr>
+                        <th>Combustível</th>
+                        <td>{{ dados.veiculo.combustivel }}</td>
+                    </tr>
+                    <tr>
+                        <th>Ano de Fabricação</th>
+                        <td>{{ dados.veiculo.anoFabricacao }}</td>
+                    </tr>
+                    <tr>
+                        <th>Entrada em MG</th>
+                        <td>{{ dados.veiculo.anoEntradaMG }}</td>
+                    </tr>
+                    <tr>
+                        <th>Aquisição</th>
+                        <td>{{ dados.veiculo.dtAquisicaoVeiculo }}</td>
+                    </tr>
+                    <tr>
+                        <th>Placa</th>
+                        <td>{{ dados.veiculo.placa }}</td>
+                    </tr>
+                    <tr>
+                        <th>Situação</th>
+                        <td>{{ dados.veiculo.status[0].descricao }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h5>Débitos</h5>
+            <div class="list-group mb-4">
+                {% for debito in dados.extratoDebitos %}
+                    <a class="list-group-item list-group-item-action" data-toggle="collapse" href="#ano{{ debito.anoExercicio }}" role="button" aria-expanded="false" aria-controls="ano{{ debito.anoExercicio }}">
+                        {% if ver_pag(debito.anoExercicio) == 'Pago' %}
+                            <i class="bi bi-plus-circle" style="color: #28a745;"></i>
+                            <span class="fw-bold" style="color: #28a745;">{{ debito.anoExercicio }}</span>
+                            <i class="bi bi-patch-check-fill" style="color: #28a745;"></i>
+                        {% else %}
+                            <i class="bi bi-plus-circle" style="color: #dc3545;"></i>
+                            <span>{{ debito.anoExercicio }}</span>
+                            <i class="bi bi-patch-exclamation-fill" style="color: #dc3545;"></i>
+                        {% endif %}
+                    </a>
+                    <div class="collapse" id="ano{{ debito.anoExercicio }}">
+                        <div class="card card-body">
+                            {% for parcelas in debito.parcelas %}
+                                <a class="list-group-item list-group-item-action" data-toggle="collapse" href="#parcelas{{ loop.index }}" role="button" aria-expanded="false" aria-controls="parcelas{{ loop.index }}">
+                                    <i class="bi bi-plus-circle" style="color: #6c757d;">{{ parcelas.descricao }}</i>
+                                </a>
+                                <div class="collapse" id="parcelas{{ loop.index }}">
+                                    <div class="card card-body">
+                                        <table class="table table-bordered">
+                                            <tbody>
+                                                <tr>
+                                                    <th>Valor Parcela</th>
+                                                    <td>{{ parcelas.valorPrincipal }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Vencimento</th>
+                                                    <td>{{ parcelas.dataVencimento }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Situação</th>
+                                                    <td>
+                                                        {% if parcelas.estaPago %}
+                                                            Pago
+                                                        {% else %}
+                                                            Em aberto
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                {% if parcelas.estaPago %}
+                                                    <tr>
+                                                        <th>Data de pagamento</th>
+                                                        <td>{{ parcelas.dataPagamento }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Valor de pagamento</th>
+                                                        <td>{{ parcelas.valorPago }}</td>
+                                                    </tr>
+                                                {% endif %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Bootstrap JS e dependências -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
