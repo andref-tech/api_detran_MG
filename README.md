@@ -1,4 +1,4 @@
-# README.md para o Projeto de Acesso à API do Detran de MG <img src='https://github.com/andref-tech/andref-tech/blob/main/Python-programming-logo-on-transparent-background-PNG.png' width='70'>
+# Acesso à API do Detran de MG <img src='https://github.com/andref-tech/andref-tech/blob/main/Python-programming-logo-on-transparent-background-PNG.png' width='70'>
 
 ## Descrição do Projeto
 
